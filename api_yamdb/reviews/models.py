@@ -1,7 +1,9 @@
 import datetime as dt
 
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import (
+    MinValueValidator, MaxValueValidator, RegexValidator
+)
 from django.contrib.auth.models import AbstractUser
 
 
@@ -15,7 +17,7 @@ class User(AbstractUser):
         help_text='Обязательно. 150 символов или меньше. Только буквы,'
                   'цифры и @/./+/-/_',
         validators=[
-            models.validators.RegexValidator(
+            RegexValidator(
                 regex=r'^[\w.@+-]+\Z',
                 message='Введите правильное имя пользователя.',
                 code='invalid_username'
