@@ -3,11 +3,12 @@ from reviews.models import Review, Comment
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    # Показываем username вместо id
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
     )
+    pub_date = serializers.DateTimeField(read_only=True)
+    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Review
@@ -28,11 +29,12 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    # Показываем username автора
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
     )
+    pub_date = serializers.DateTimeField(read_only=True)
+    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Comment

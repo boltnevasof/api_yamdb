@@ -11,6 +11,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+#для миграций чтобы джанго понимал какого юзера использовать
+AUTH_USER_MODEL = 'reviews.User'
 
 # Application definition
 
@@ -103,3 +105,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ]
+}
