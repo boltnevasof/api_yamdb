@@ -1,9 +1,24 @@
-from rest_framework import viewsets, permissions
+from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import (
+    filters,
+    mixins,
+    pagination,
+    permissions,
+    viewsets,
+)
 from rest_framework.generics import get_object_or_404
 
-from reviews.models import Review, Comment, Title
-from api.serializers import ReviewSerializer, CommentSerializer
-from api.permissions import IsAuthorOrModeratorOrAdmin
+from reviews.models import Category, Comment, Genre, Review, Title
+from api.filters import TitleFilter
+from api.serializers import (
+    CategorySerializer,
+    CommentSerializer,
+    GenreSerializer,
+    ReviewSerializer,
+    TitleSerializer
+)
+from api.permissions import IsAuthorOrModeratorOrAdmin, IsAdminOrReadOnly
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -46,3 +61,51 @@ class CommentViewSet(viewsets.ModelViewSet):
             title_id=self.kwargs.get('title_id')
         )
         serializer.save(author=self.request.user, review=review)
+
+
+class CreateListDestroyViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    pass
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    http_method_names = ['get', 'post', 'patch', 'delete']
+    pagination_class = pagination.LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('name', 'genre__slug', 'category__slug')
+    filterset_class = TitleFilter
+    permission_classes = (IsAdminOrReadOnly,)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return (
+            queryset
+            .order_by('-year')
+            .annotate(rating=Avg('reviews__score'))
+        )
+
+
+class GenreViewSet(CreateListDestroyViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    pagination_class = pagination.LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+    permission_classes = (IsAdminOrReadOnly,)
+
+
+class CategoryViewSet(CreateListDestroyViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    pagination_class = pagination.LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+    permission_classes = (IsAdminOrReadOnly,)

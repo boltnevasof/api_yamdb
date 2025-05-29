@@ -9,3 +9,21 @@ class IsAuthorOrModeratorOrAdmin(permissions.BasePermission):
             or request.user.is_staff
             or request.user.role in ('moderator', 'admin')
         )
+
+
+class IsAdminOrReadOnly(permissions.BasePermission):
+    """Администратор или только чтение."""
+
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.user.is_authenticated:
+            return request.user.is_admin
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.user.is_authenticated:
+            return request.user.is_admin
+        return False
