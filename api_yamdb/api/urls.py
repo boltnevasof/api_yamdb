@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from api.views import ReviewViewSet, CommentViewSet
 
 review_list = ReviewViewSet.as_view({
@@ -42,4 +42,6 @@ urlpatterns = [
         comment_detail,
         name='comment-detail'
     ),
+    path('auth/', include('users.urls'))
+    
 ]
