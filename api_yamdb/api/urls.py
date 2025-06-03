@@ -1,13 +1,7 @@
-from django.urls import path, include
+from api.views import (CategoryViewSet, CommentViewSet, GenreViewSet,
+                       ReviewViewSet, TitleViewSet)
+from django.urls import include, path
 from rest_framework import routers
-from api.views import (
-    CategoryViewSet,
-    CommentViewSet,
-    GenreViewSet,
-    ReviewViewSet,
-    TitleViewSet
-)
-from api.views import ReviewViewSet, CommentViewSet
 
 review_list = ReviewViewSet.as_view({
     'get': 'list',
