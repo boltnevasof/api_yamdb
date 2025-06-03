@@ -7,6 +7,7 @@ from api.views import (
     ReviewViewSet,
     TitleViewSet
 )
+from api.views import ReviewViewSet, CommentViewSet
 
 review_list = ReviewViewSet.as_view({
     'get': 'list',
@@ -55,4 +56,6 @@ urlpatterns = [
         comment_detail,
         name='comment-detail'
     ),
+    path('', include('users.urls'))
+
 ]

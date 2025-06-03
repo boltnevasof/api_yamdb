@@ -27,3 +27,20 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         if request.user.is_authenticated:
             return request.user.is_admin
         return False
+
+
+class AdminOnly(permissions.BasePermission):
+    """
+    Только пользователи с правами администратора (is_staff)
+    или ролью 'admin' имеют разрешение на доступ.
+    """
+
+    def has_permission(self, request, view):
+        """Проверяет разрешение доступа на уровне представления."""
+        return (
+            request.user.is_authenticated
+            and (
+                request.user.is_staff
+                or request.user.role == 'admin'
+            )
+        )
