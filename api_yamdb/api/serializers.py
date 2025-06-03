@@ -1,8 +1,7 @@
 from django.db import IntegrityError
 from rest_framework import serializers
-
 from reviews.models import Category, Comment, Genre, Review, Title
-from users.models import User, ROLE_CHOICES, REGEX_USERNAME
+from users.models import REGEX_USERNAME, ROLE_CHOICES, User
 
 
 class ReviewSerializer(serializers.ModelSerializer):
