@@ -1,11 +1,18 @@
-from django.urls import path
-from .views import ObtainTokenView
-from .views import RegisterView, SendConfirmationCodeView
+from django.urls import path, include
+from api.views import Signup, TokenObtain, UsersViewSet
+from rest_framework.routers import DefaultRouter
 
+app_name = 'users'
 
+router = DefaultRouter()
+router.register(
+    'users',
+    UsersViewSet,
+    basename='users'
+)
 urlpatterns = [
-    path('signup/', RegisterView.as_view(), name='register'),
-    path('send-confirmation/', SendConfirmationCodeView.as_view(),
-         name='send-confirmation'),
-    path('token/', ObtainTokenView.as_view(), name='token-obtain'),
+    path('auth/signup/', Signup.as_view(), name='signup'),
+    path('auth/token/', TokenObtain.as_view(), name='token-obtain'),
+    path('', include(router.urls)),
+
 ]

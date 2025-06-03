@@ -42,6 +42,6 @@ urlpatterns = [
         comment_detail,
         name='comment-detail'
     ),
-    path('auth/', include('users.urls'))
-    
+    path('', include('users.urls'))
+
 ]
