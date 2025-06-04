@@ -1,5 +1,6 @@
 from django.db import IntegrityError
 from rest_framework import serializers
+from django.shortcuts import get_object_or_404
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import REGEX_USERNAME, ROLE_CHOICES, User
 
@@ -22,9 +23,9 @@ class ReviewSerializer(serializers.ModelSerializer):
         title_id = self.context['view'].kwargs.get('title_id')
 
         if request.method == 'POST':
+            title = get_object_or_404(Title, id=title_id)
             author = request.user
-            if Review.objects.filter(title_id=title_id, author=author
-                                     ).exists():
+            if title.reviews.filter(author=author).exists():
                 raise serializers.ValidationError(
                     'Вы уже оставили отзыв на это произведение.'
                 )

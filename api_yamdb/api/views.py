@@ -10,7 +10,7 @@ from django.core.mail import EmailMessage
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (filters, mixins, pagination, permissions, status,
-                            viewsets)
+                            viewsets, exceptions)
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
@@ -24,19 +24,26 @@ from reviews.models import Category, Genre, Review, Title, User
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Вьюсет для отзывов на произведения."""
+
     serializer_class = ReviewSerializer
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
         IsAuthorOrModeratorOrAdmin
     )
 
+    def get_title(self):
+        return get_object_or_404(Title, id=self.kwargs.get('title_id'))
+
     def get_queryset(self):
-        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        return title.reviews.all()
+        return self.get_title().reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(author=self.request.user, title=self.get_title())
+
+    def update(self, request, *args, **kwargs):
+        if not kwargs.get('partial', False):
+            raise exceptions.MethodNotAllowed('PUT')
+        return super().update(request, *args, **kwargs)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -47,21 +54,18 @@ class CommentViewSet(viewsets.ModelViewSet):
         IsAuthorOrModeratorOrAdmin
     )
 
-    def get_queryset(self):
-        review = get_object_or_404(
+    def get_review(self):
+        return get_object_or_404(
             Review,
             id=self.kwargs.get('review_id'),
             title_id=self.kwargs.get('title_id')
         )
-        return review.comments.all()
+
+    def get_queryset(self):
+        return self.get_review().comments.all()
 
     def perform_create(self, serializer):
-        review = get_object_or_404(
-            Review,
-            id=self.kwargs.get('review_id'),
-            title_id=self.kwargs.get('title_id')
-        )
-        serializer.save(author=self.request.user, review=review)
+        serializer.save(author=self.request.user, review=self.get_review())
 
 
 class CreateListDestroyViewSet(
