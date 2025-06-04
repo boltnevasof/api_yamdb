@@ -95,7 +95,6 @@ class CreateListDestroyViewSet(
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
     serializer_class = TitleSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = pagination.LimitOffsetPagination
@@ -105,7 +104,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = Title.objects.all()
         return (
             queryset
             .order_by('-year')
@@ -144,7 +143,7 @@ class UsersViewSet(ModelViewSet):
     search_fields = ('username',)
 
     @action(
-        methods=['GET', 'PATCH'],
+        methods=('GET', 'PATCH'),
         detail=False,
         permission_classes=(IsAuthenticated,),
         url_path='me'
