@@ -53,6 +53,6 @@ http://127.0.0.1:8000/redoc/
 ### Авторы:
 ## Софья Болтнева, Анастасия Каймакова, Максим Колисниченко
 # Ссылки на GitHub: 
-# https://github.com/boltnevasof
-# https://github.com/AnastasiaKaymakova
-# https://github.com/KenKolis
+### https://github.com/boltnevasof
+### https://github.com/AnastasiaKaymakova
+### https://github.com/KenKolis
