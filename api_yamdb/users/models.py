@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 
+from reviews.constants import USERNAME_LENGTH
 
 USER = 'user'
 ADMIN = 'admin'
@@ -22,7 +23,7 @@ class User(AbstractUser):
 
     username = models.CharField(
         'Никнейм',
-        max_length=150,
+        max_length=USERNAME_LENGTH,
         unique=True,
         help_text='Обязательно. 150 символов или меньше. Только буквы,'
                   'цифры и @/./+/-/_',
@@ -42,20 +43,17 @@ class User(AbstractUser):
     )
     first_name = models.CharField(
         'Имя',
-        max_length=150,
-        blank=True,
-        null=True
+        max_length=USERNAME_LENGTH,
+        blank=True
     )
     last_name = models.CharField(
         'Фамилия',
         max_length=150,
-        blank=True,
-        null=True
+        blank=True
     )
     bio = models.TextField(
         'Биография',
-        blank=True,
-        null=True
+        blank=True
     )
     # Выбор роли из трех возможных
     role = models.CharField(

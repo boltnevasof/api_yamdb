@@ -5,9 +5,11 @@ from api.views import (
     CommentViewSet,
     GenreViewSet,
     ReviewViewSet,
-    TitleViewSet
+    Signup,
+    TitleViewSet,
+    TokenObtain,
+    UsersViewSet
 )
-from api.views import ReviewViewSet, CommentViewSet
 
 review_list = ReviewViewSet.as_view({
     'get': 'list',
@@ -30,12 +32,15 @@ comment_detail = CommentViewSet.as_view({
 })
 
 router = routers.DefaultRouter()
+router.register('users', UsersViewSet, basename='users')
 router.register(r'titles', TitleViewSet, basename='titles')
 router.register(r'categories', CategoryViewSet, basename='categories')
 router.register(r'genres', GenreViewSet, basename='genres')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('auth/signup/', Signup.as_view(), name='signup'),
+    path('auth/token/', TokenObtain.as_view(), name='token-obtain'),
     path(
         'titles/<int:title_id>/reviews/',
         review_list,
@@ -55,7 +60,5 @@ urlpatterns = [
         'titles/<int:title_id>/reviews/<int:review_id>/comments/<int:pk>/',
         comment_detail,
         name='comment-detail'
-    ),
-    path('', include('users.urls'))
-
+    )
 ]

@@ -31,10 +31,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
 
 class AdminOnly(permissions.BasePermission):
-    """
-    Только пользователи с правами администратора (is_staff)
-    или ролью 'admin' имеют разрешение на доступ.
-    """
+    """Только администратор имеет доступ."""
 
     def has_permission(self, request, view):
         """Проверяет разрешение доступа на уровне представления."""
