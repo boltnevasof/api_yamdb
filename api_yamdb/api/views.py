@@ -7,17 +7,15 @@ from rest_framework import (
     status, viewsets, exceptions
 )
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from reviews.models import (
-    Category, Comment, Genre, Review, Title, User
+    Category, Genre, Review, Title, User
 )
 
 from api.filters import TitleFilter
@@ -155,7 +153,7 @@ class UsersViewSet(ModelViewSet):
         serializer = UsersSerializer(request.user)
 
         if request.method == 'PATCH':
-            if request.user.role == 'admin':
+            if request.user.is_admin:
                 serializer = AdminUsersSerializer(
                     request.user,
                     data=request.data,
@@ -179,17 +177,8 @@ class TokenObtain(APIView):
     def post(self, request):
         serializer = TokenObtainSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        try:
-            user = User.objects.get(username=data['username'])
-        except User.DoesNotExist:
-            raise NotFound(detail={'username': 'Пользователь не найден'})
-        if data.get('confirmation_code') == user.confirmation_code:
-            token = RefreshToken.for_user(user).access_token
-            raise ValidationError({'token': str(token)})
-        return Response(
-            {'confirmation_code': 'Неверный код подтверждения!'},
-            status=status.HTTP_400_BAD_REQUEST)
+        token = serializer.validated_data['token']
+        return Response({'token': token}, status=status.HTTP_200_OK)
 
 
 class Signup(APIView):

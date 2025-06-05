@@ -3,7 +3,8 @@ from django.db import IntegrityError
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from reviews.models import Category, Comment, Genre, Review, Title
-
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import ValidationError
 from users.models import REGEX_USERNAME, ROLE_CHOICES
 
 User = get_user_model()
@@ -152,3 +153,25 @@ class TokenObtainSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'confirmation_code')
+
+    class TokenObtainSerializer(serializers.ModelSerializer):
+        username = serializers.CharField(required=True)
+        confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code')
+
+    def validate(self, data):
+        username = data.get('username')
+        confirmation_code = data.get('confirmation_code')
+
+        user = get_object_or_404(User, username=username)
+
+        if confirmation_code != user.confirmation_code:
+            raise ValidationError(
+                {'confirmation_code': 'Неверный код подтверждения!'})
+
+        token = RefreshToken.for_user(user).access_token
+        data['token'] = str(token)
+        return data

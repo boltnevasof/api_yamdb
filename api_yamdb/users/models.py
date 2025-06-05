@@ -71,24 +71,18 @@ class User(AbstractUser):
         blank=False,
         default='0000'
     )
+    is_superuser = models.BooleanField(default=False)
 
-    # Аттрибут проверки на юзера
-    @property
-    def is_user(self):
-        return self.role == 'user'
-
-    # Аттрибут проверки на админа
     @property
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role == 'admin' or self.is_superuser
 
-    # Аттрибут проверки на модератора
     @property
     def is_moderator(self):
-        return self.role == 'moderator'
+        return self.role == 'moderator' or self.is_superuser
 
     class Meta:
-        ordering = ('id',)
+        ordering = ('username',)
         verbose_name = 'Пользователь'
         verbose_name_plural = 'пользователи'
 
