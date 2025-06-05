@@ -2,15 +2,16 @@ import datetime as dt
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from reviews.constants import NAME_LENGTH
 
+from reviews.constants import NAME_LENGTH, SLUG_LENGTH
+from reviews.utils import check_year_availability
 from users.models import User
 
 
 class Category(models.Model):
     # Модель для выбора категории произведения
     name = models.CharField('Название', max_length=NAME_LENGTH)
-    slug = models.SlugField('Слаг', max_length=50, unique=True)
+    slug = models.SlugField('Слаг', max_length=SLUG_LENGTH, unique=True)
 
     class Meta:
         verbose_name = 'Категория'
@@ -24,7 +25,7 @@ class Category(models.Model):
 class Genre(models.Model):
     # Модель для выбора жанра произведения
     name = models.CharField('Название', max_length=NAME_LENGTH)
-    slug = models.SlugField('Слаг', max_length=50, unique=True)
+    slug = models.SlugField('Слаг', max_length=SLUG_LENGTH, unique=True)
 
     class Meta:
         verbose_name = 'Жанр'
@@ -37,13 +38,11 @@ class Genre(models.Model):
 class Title(models.Model):
     # Модель для хранения информации о произведении
     name = models.CharField('Название', max_length=NAME_LENGTH)
-    year = models.PositiveSmallIntegerField(
+    year = models.PositiveIntegerField(
         'Год выхода',
-        validators=[
-            MaxValueValidator(dt.datetime.now().year),
-        ],
+        validators=(check_year_availability,)
     )
-    description = models.TextField('Описание', blank=True, null=True)
+    description = models.TextField('Описание', blank=True)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -51,7 +50,7 @@ class Title(models.Model):
         related_name='titles',
         verbose_name='Категория',
     )
-    genre = models.ManyToManyField(Genre, through='TitleGenre')
+    genre = models.ManyToManyField(Genre)
 
     class Meta:
         verbose_name = 'Произведение'
@@ -59,19 +58,6 @@ class Title(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-
-class TitleGenre(models.Model):
-    # Промежуточная модель для хранения ключей genre и title
-    genre = models.ForeignKey(
-        Genre, on_delete=models.SET_NULL, null=True, verbose_name='Жанр'
-    )
-    title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, verbose_name='Произведение'
-    )
-
-    def __str__(self) -> str:
-        return f'{self.title} - {self.genre}'
 
 
 class Review(models.Model):

@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from reviews.models import Category, Comment, Genre, Review, Title
 
-from users.models import REGEX_USERNAME, ROLE_CHOICES 
+from users.models import REGEX_USERNAME, ROLE_CHOICES
 
 User = get_user_model()
 
@@ -107,10 +107,7 @@ class AdminUsersSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        max_length=254,
-        required=True,
-    )
+    email = serializers.EmailField(required=True, max_length=254)
     username = serializers.RegexField(
         regex=REGEX_USERNAME,
         max_length=150,

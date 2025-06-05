@@ -1,17 +1,13 @@
-from api.filters import TitleFilter
-from api.permissions import (AdminOnly, IsAdminOrReadOnly,
-                             IsAuthorOrModeratorOrAdmin)
-from api.serializers import (AdminUsersSerializer, CategorySerializer,
-                             CommentSerializer, GenreSerializer,
-                             ReviewSerializer, SignUpSerializer,
-                             TitleSerializer, TokenObtainSerializer,
-                             UsersSerializer)
+from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (filters, mixins, pagination, permissions, status,
-                            viewsets, exceptions)
+from rest_framework import (
+    filters, mixins, pagination, permissions,
+    status, viewsets, exceptions
+)
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -19,7 +15,31 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Category, Genre, Review, Title, User
+
+from reviews.models import (
+    Category, Comment, Genre, Review, Title, User
+)
+
+from api.filters import TitleFilter
+from api.permissions import (
+    IsAuthorOrModeratorOrAdmin,
+    IsAdminOrReadOnly,
+    AdminOnly
+)
+from api.serializers import (
+    SignUpSerializer,
+    UsersSerializer,
+    TokenObtainSerializer,
+    AdminUsersSerializer,
+    CategorySerializer,
+    CommentSerializer,
+    GenreSerializer,
+    ReviewSerializer,
+    TitleSerializer,
+)
+
+
+User = get_user_model()
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -163,13 +183,10 @@ class TokenObtain(APIView):
         try:
             user = User.objects.get(username=data['username'])
         except User.DoesNotExist:
-            return Response(
-                {'username': 'Пользователь не найден!'},
-                status=status.HTTP_404_NOT_FOUND)
+            raise NotFound(detail={'username': 'Пользователь не найден'})
         if data.get('confirmation_code') == user.confirmation_code:
             token = RefreshToken.for_user(user).access_token
-            return Response({'token': str(token)},
-                            status=status.HTTP_201_CREATED)
+            raise ValidationError({'token': str(token)})
         return Response(
             {'confirmation_code': 'Неверный код подтверждения!'},
             status=status.HTTP_400_BAD_REQUEST)
