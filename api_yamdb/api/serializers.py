@@ -1,8 +1,12 @@
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from reviews.models import Category, Comment, Genre, Review, Title
-from users.models import REGEX_USERNAME, ROLE_CHOICES, User
+
+from users.models import REGEX_USERNAME, ROLE_CHOICES 
+
+User = get_user_model()
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -64,7 +68,10 @@ class TitleSerializer(serializers.ModelSerializer):
     )
     rating = serializers.IntegerField(read_only=True)
     genre = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Genre.objects.all(), many=True
+        slug_field='slug',
+        queryset=Genre.objects.all(),
+        many=True,
+        allow_empty=True
     )
 
     class Meta:

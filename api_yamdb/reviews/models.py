@@ -2,17 +2,20 @@ import datetime as dt
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from reviews.constants import NAME_LENGTH
+
 from users.models import User
 
 
 class Category(models.Model):
     # Модель для выбора категории произведения
-    name = models.CharField('Название', max_length=256)
+    name = models.CharField('Название', max_length=NAME_LENGTH)
     slug = models.SlugField('Слаг', max_length=50, unique=True)
 
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -20,7 +23,7 @@ class Category(models.Model):
 
 class Genre(models.Model):
     # Модель для выбора жанра произведения
-    name = models.CharField('Название', max_length=256)
+    name = models.CharField('Название', max_length=NAME_LENGTH)
     slug = models.SlugField('Слаг', max_length=50, unique=True)
 
     class Meta:
@@ -33,7 +36,7 @@ class Genre(models.Model):
 
 class Title(models.Model):
     # Модель для хранения информации о произведении
-    name = models.CharField('Название', max_length=256)
+    name = models.CharField('Название', max_length=NAME_LENGTH)
     year = models.PositiveSmallIntegerField(
         'Год выхода',
         validators=[

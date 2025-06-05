@@ -8,7 +8,8 @@ class IsAuthorOrModeratorOrAdmin(permissions.BasePermission):
             request.method in permissions.SAFE_METHODS
             or obj.author == request.user
             or request.user.is_staff
-            or request.user.role in ('moderator', 'admin')
+            or request.user.is_moderator
+            or request.user.is_admin
         )
 
 
