@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
-from rest_framework import serializers
 from django.shortcuts import get_object_or_404
-from reviews.models import Category, Comment, Genre, Review, Title
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.tokens import RefreshToken
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import REGEX_USERNAME, ROLE_CHOICES
 
 User = get_user_model()
