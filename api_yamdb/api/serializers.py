@@ -108,8 +108,10 @@ class AdminUsersSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-
-    email = serializers.EmailField(required=True, max_length=254)
+    email = serializers.EmailField(
+        required=True,
+        max_length=254,
+    )
     username = serializers.RegexField(
         regex=REGEX_USERNAME,
         max_length=150,
@@ -118,33 +120,37 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
-            'email',
-            'username',
-        )
+        fields = ('email', 'username')
 
-    def create(self, validated_data):
-        """Создает нового пользователя на основе переданных данных."""
-        try:
-            user, _ = User.objects.get_or_create(
-                username=validated_data.get('username'),
-                email=validated_data.get('email'),
-            )
-        except IntegrityError as error:
-            raise serializers.ValidationError(
-                'Такое имя пользователя уже существует.'
-                if 'username' in str(error)
-                else 'Пользователь с таким электронным адресом уже существует.'
-            )
-        return user
-
-    def validate_username(self, value: str) -> str:
-        """Проверка имени пользователя на недопустимые значения."""
+    def validate_username(self, value):
         if value.lower() == 'me':
             raise serializers.ValidationError(
                 'Имя пользователя "me" недопустимо.'
             )
         return value
+
+    def validate(self, data):
+        username = data.get('username')
+        email = data.get('email')
+
+        user_with_username = User.objects.filter(username=username).first()
+        user_with_email = User.objects.filter(email=email).first()
+
+        if user_with_username and user_with_username.email != email:
+            raise serializers.ValidationError(
+                'Пользователь с таким username уже существует.'
+            )
+
+        if user_with_email and user_with_email.username != username:
+            raise serializers.ValidationError(
+                'Пользователь с таким email уже существует.'
+            )
+
+        return data
+
+    def create(self, validated_data):
+        user, _ = User.objects.get_or_create(**validated_data)
+        return user
 
 
 class TokenObtainSerializer(serializers.ModelSerializer):
