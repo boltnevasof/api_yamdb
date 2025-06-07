@@ -172,6 +172,7 @@ class UsersViewSet(ModelViewSet):
 
 
 class TokenObtain(APIView):
+    '''Представление получения токена.'''
     permission_classes = (AllowAny,)
 
     def post(self, request):
