@@ -1,41 +1,29 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from reviews.constants import NAME_LENGTH, SLUG_LENGTH
-from reviews.utils import check_year_availability
+from reviews.abstracts import BaseNameSlugModel
+from reviews.constants import NAME_LENGTH
+from reviews.functions import check_year_availability
 from users.models import User
 
 
-class Category(models.Model):
+class Category(BaseNameSlugModel):
     # Модель для выбора категории произведения
-    name = models.CharField('Название', max_length=NAME_LENGTH)
-    slug = models.SlugField('Слаг', max_length=SLUG_LENGTH, unique=True)
-
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
-        ordering = ('name',)
-
-    def __str__(self):
-        return self.name
 
 
-class Genre(models.Model):
+class Genre(BaseNameSlugModel):
     # Модель для выбора жанра произведения
-    name = models.CharField('Название', max_length=NAME_LENGTH)
-    slug = models.SlugField('Слаг', max_length=SLUG_LENGTH, unique=True)
-
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
-
-    def __str__(self):
-        return self.name
 
 
 class Title(models.Model):
     # Модель для хранения информации о произведении
     name = models.CharField('Название', max_length=NAME_LENGTH)
-    year = models.PositiveIntegerField(
+    year = models.IntegerField(
         'Год выхода',
         validators=(check_year_availability,)
     )
