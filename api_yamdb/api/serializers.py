@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from reviews.models import Category, Comment, Genre, Review, Title
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import ValidationError
-from users.models import REGEX_USERNAME, ROLE_CHOICES
+from users.models import REGEX_USERNAME, RoleChoices
 
 User = get_user_model()
 
@@ -89,7 +89,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class UsersSerializer(serializers.ModelSerializer):
-    role = serializers.ChoiceField(choices=ROLE_CHOICES, read_only=True)
+    role = serializers.ChoiceField(choices=RoleChoices.choices, read_only=True)
 
     class Meta:
         model = User
@@ -108,6 +108,7 @@ class AdminUsersSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
+
     email = serializers.EmailField(required=True, max_length=254)
     username = serializers.RegexField(
         regex=REGEX_USERNAME,
@@ -149,14 +150,6 @@ class SignUpSerializer(serializers.ModelSerializer):
 class TokenObtainSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = ('username', 'confirmation_code')
-
-    class TokenObtainSerializer(serializers.ModelSerializer):
-        username = serializers.CharField(required=True)
-        confirmation_code = serializers.CharField(required=True)
 
     class Meta:
         model = User

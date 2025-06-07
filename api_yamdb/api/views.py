@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from reviews.models import (
-    Category, Genre, Review, Title, User
+    Category, Genre, Review, Title
 )
 
 from api.filters import TitleFilter
@@ -189,7 +189,7 @@ class Signup(APIView):
         email = EmailMessage(
             subject=data['email_subject'],
             body=data['email_body'],
-            to=[data['to_email']]
+            to=(data['to_email'],)
         )
         email.send()
 
