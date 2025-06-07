@@ -1,11 +1,17 @@
+from api.filters import TitleFilter
+from api.permissions import (AdminOnly, IsAdminOrReadOnly,
+                             IsAuthorOrModeratorOrAdmin)
+from api.serializers import (AdminUsersSerializer, CategorySerializer,
+                             CommentSerializer, GenreSerializer,
+                             ReviewSerializer, SignUpSerializer,
+                             TitleSerializer, TokenObtainSerializer,
+                             UsersSerializer)
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (
-    filters, mixins, pagination, permissions,
-    status, viewsets, exceptions
-)
+from rest_framework import (exceptions, filters, mixins, pagination,
+                            permissions, status, viewsets)
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import get_object_or_404
@@ -13,29 +19,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-
-from reviews.models import (
-    Category, Genre, Review, Title
-)
-
-from api.filters import TitleFilter
-from api.permissions import (
-    IsAuthorOrModeratorOrAdmin,
-    IsAdminOrReadOnly,
-    AdminOnly
-)
-from api.serializers import (
-    SignUpSerializer,
-    UsersSerializer,
-    TokenObtainSerializer,
-    AdminUsersSerializer,
-    CategorySerializer,
-    CommentSerializer,
-    GenreSerializer,
-    ReviewSerializer,
-    TitleSerializer,
-)
-
+from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
 

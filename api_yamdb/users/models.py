@@ -1,16 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
-
 from django.db import models
-
-from reviews.constants import (
-    USERNAME_LENGTH,
-    CONFIRMATION_CODE_LENGTH,
-    ROLE_LENGTH,
-    EMAIL_LENGTH,
-    FIRSTNAME_LENGTH,
-    LASTNAME_LENGTH
-)
+from reviews.constants import (CONFIRMATION_CODE_LENGTH, EMAIL_LENGTH,
+                               FIRSTNAME_LENGTH, LASTNAME_LENGTH, ROLE_LENGTH,
+                               USERNAME_LENGTH)
 
 USER = 'user'
 ADMIN = 'admin'

@@ -1,8 +1,5 @@
-import datetime as dt
-
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-
 from reviews.constants import NAME_LENGTH, SLUG_LENGTH
 from reviews.utils import check_year_availability
 from users.models import User

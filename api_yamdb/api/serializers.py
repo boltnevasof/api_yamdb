@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
-from django.db import IntegrityError
-from rest_framework import serializers
+from django.core.validators import RegexValidator
 from django.shortcuts import get_object_or_404
-from reviews.models import Category, Comment, Genre, Review, Title
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.tokens import RefreshToken
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import REGEX_USERNAME, RoleChoices
 
 User = get_user_model()
@@ -110,12 +110,18 @@ class AdminUsersSerializer(serializers.ModelSerializer):
 class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True,
-        max_length=254,
+        max_length=User._meta.get_field('email').max_length,
     )
-    username = serializers.RegexField(
-        regex=REGEX_USERNAME,
-        max_length=150,
+    username = serializers.CharField(
         required=True,
+        max_length=User._meta.get_field('username').max_length,
+        validators=[
+            RegexValidator(
+                regex=REGEX_USERNAME,
+                message='Введите правильное имя пользователя.',
+                code='invalid_username'
+            )
+        ]
     )
 
     class Meta:
