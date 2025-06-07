@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.db import IntegrityError
+from django.core.validators import RegexValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Category, Comment, Genre, Review, Title
-from users.models import REGEX_USERNAME, ROLE_CHOICES
+from users.models import REGEX_USERNAME, RoleChoices
 
 User = get_user_model()
 
@@ -89,7 +89,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class UsersSerializer(serializers.ModelSerializer):
-    role = serializers.ChoiceField(choices=ROLE_CHOICES, read_only=True)
+    role = serializers.ChoiceField(choices=RoleChoices.choices, read_only=True)
 
     class Meta:
         model = User
@@ -108,55 +108,60 @@ class AdminUsersSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True, max_length=254)
-    username = serializers.RegexField(
-        regex=REGEX_USERNAME,
-        max_length=150,
+    email = serializers.EmailField(
         required=True,
+        max_length=User._meta.get_field('email').max_length,
+    )
+    username = serializers.CharField(
+        required=True,
+        max_length=User._meta.get_field('username').max_length,
+        validators=[
+            RegexValidator(
+                regex=REGEX_USERNAME,
+                message='Введите правильное имя пользователя.',
+                code='invalid_username'
+            )
+        ]
     )
 
     class Meta:
         model = User
-        fields = (
-            'email',
-            'username',
-        )
+        fields = ('email', 'username')
 
-    def create(self, validated_data):
-        """Создает нового пользователя на основе переданных данных."""
-        try:
-            user, _ = User.objects.get_or_create(
-                username=validated_data.get('username'),
-                email=validated_data.get('email'),
-            )
-        except IntegrityError as error:
-            raise serializers.ValidationError(
-                'Такое имя пользователя уже существует.'
-                if 'username' in str(error)
-                else 'Пользователь с таким электронным адресом уже существует.'
-            )
-        return user
-
-    def validate_username(self, value: str) -> str:
-        """Проверка имени пользователя на недопустимые значения."""
+    def validate_username(self, value):
         if value.lower() == 'me':
             raise serializers.ValidationError(
                 'Имя пользователя "me" недопустимо.'
             )
         return value
 
+    def validate(self, data):
+        username = data.get('username')
+        email = data.get('email')
+
+        user_with_username = User.objects.filter(username=username).first()
+        user_with_email = User.objects.filter(email=email).first()
+
+        if user_with_username and user_with_username.email != email:
+            raise serializers.ValidationError(
+                'Пользователь с таким username уже существует.'
+            )
+
+        if user_with_email and user_with_email.username != username:
+            raise serializers.ValidationError(
+                'Пользователь с таким email уже существует.'
+            )
+
+        return data
+
+    def create(self, validated_data):
+        user, _ = User.objects.get_or_create(**validated_data)
+        return user
+
 
 class TokenObtainSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = ('username', 'confirmation_code')
-
-    class TokenObtainSerializer(serializers.ModelSerializer):
-        username = serializers.CharField(required=True)
-        confirmation_code = serializers.CharField(required=True)
 
     class Meta:
         model = User

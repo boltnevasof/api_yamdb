@@ -40,6 +40,6 @@ class AdminOnly(permissions.BasePermission):
             request.user.is_authenticated
             and (
                 request.user.is_staff
-                or request.user.role == 'admin'
+                or request.user.is_admin
             )
         )

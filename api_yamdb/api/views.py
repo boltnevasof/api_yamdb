@@ -19,7 +19,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from reviews.models import Category, Genre, Review, Title, User
+from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
 
@@ -43,13 +43,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, title=self.get_title())
 
     def update(self, request, *args, **kwargs):
-        if not kwargs.get('partial', False):
+        partial = kwargs.pop('partial', False)
+        if not partial:
             raise exceptions.MethodNotAllowed('PUT')
-        return super().update(request, *args, **kwargs)
+        return super().update(request, partial=partial, *args, **kwargs)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     """Вьюсет для комментариев к отзывам."""
+
     serializer_class = CommentSerializer
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
@@ -119,6 +121,7 @@ class CategoryViewSet(CreateListDestroyViewSet):
 
 class UsersViewSet(ModelViewSet):
     """ Представление для работы с пользователями в системе."""
+
     serializer_class = AdminUsersSerializer
     queryset = User.objects.order_by('username').all()
     lookup_field = 'username'
@@ -173,7 +176,7 @@ class Signup(APIView):
         email = EmailMessage(
             subject=data['email_subject'],
             body=data['email_body'],
-            to=[data['to_email']]
+            to=(data['to_email'],)
         )
         email.send()
 
