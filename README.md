@@ -45,10 +45,10 @@ http://127.0.0.1:8000/redoc/
 
 
 Стек:
-- Django 4.1.1
-- DRF 3.14.0
-- djangorestframework-simplejwt 5.2.1
-- PyJWT 2.5.0
+- Django 3.2
+- DRF 3.12.4
+- djangorestframework-simplejwt 4.7.2
+- PyJWT 2.1.0
 
 ### Авторы:
 ## Софья Болтнева, Анастасия Каймакова, Максим Колисниченко
