@@ -84,7 +84,7 @@ class CreateListDestroyViewSet(
 
 class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete')
     pagination_class = pagination.LimitOffsetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('name', 'genre__slug', 'category__slug')
