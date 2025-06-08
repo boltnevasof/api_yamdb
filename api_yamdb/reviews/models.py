@@ -2,20 +2,20 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from reviews.abstracts import BaseNameSlugModel
 from reviews.constants import NAME_LENGTH
-from reviews.functions import check_year_availability
+from reviews.validators import check_year_availability
 from users.models import User
 
 
 class Category(BaseNameSlugModel):
     # Модель для выбора категории произведения
-    class Meta:
+    class Meta(BaseNameSlugModel.Meta):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
 
 class Genre(BaseNameSlugModel):
     # Модель для выбора жанра произведения
-    class Meta:
+    class Meta(BaseNameSlugModel.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
@@ -23,7 +23,7 @@ class Genre(BaseNameSlugModel):
 class Title(models.Model):
     # Модель для хранения информации о произведении
     name = models.CharField('Название', max_length=NAME_LENGTH)
-    year = models.IntegerField(
+    year = models.SmallIntegerField(
         'Год выхода',
         validators=(check_year_availability,)
     )
@@ -35,7 +35,7 @@ class Title(models.Model):
         related_name='titles',
         verbose_name='Категория',
     )
-    genre = models.ManyToManyField(Genre)
+    genre = models.ManyToManyField(Genre, verbose_name='Жанр')
 
     class Meta:
         verbose_name = 'Произведение'
@@ -49,20 +49,31 @@ class Review(models.Model):
     # модель отзыва на произведение
     title = models.ForeignKey(
         # Позволяет получить все отзывы через title.reviews.all()
-        Title, on_delete=models.CASCADE, related_name='reviews'
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Произведение'
     )
     # Текс отзыва
-    text = models.TextField()
+    text = models.TextField(
+        verbose_name='Текст отзыва'
+    )
     # Автор отзыва (пользователь)
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews'
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Автор отзыва'
     )
     # оценка от 1 до 10
     score = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(10)]
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        verbose_name='Оценка'
     )
     # дата публикации
-    pub_date = models.DateTimeField(auto_now_add=True)
+    pub_date = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата публикации'
+    )
 
     class Meta:
         # один пользователь оставляет один отзыв

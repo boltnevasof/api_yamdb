@@ -109,11 +109,9 @@ class AdminUsersSerializer(serializers.ModelSerializer):
 
 class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
-        required=True,
         max_length=User._meta.get_field('email').max_length,
     )
     username = serializers.CharField(
-        required=True,
         max_length=User._meta.get_field('username').max_length,
         validators=[
             RegexValidator(
