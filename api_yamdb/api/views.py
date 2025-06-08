@@ -126,8 +126,8 @@ class UsersViewSet(ModelViewSet):
     serializer_class = AdminUsersSerializer
     queryset = User.objects.order_by('username').all()
     lookup_field = 'username'
-    http_method_names = ['get', 'post', 'patch', 'delete']
-    permission_classes = [IsAuthenticated, AdminOnly]
+    http_method_names = ('get', 'post', 'patch', 'delete')
+    permission_classes = (IsAuthenticated, AdminOnly)
     filter_backends = (SearchFilter,)
     search_fields = ('username',)
 

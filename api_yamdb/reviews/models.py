@@ -2,20 +2,20 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from reviews.abstracts import BaseNameSlugModel
 from reviews.constants import NAME_LENGTH
-from reviews.functions import check_year_availability
+from reviews.validators import check_year_availability
 from users.models import User
 
 
 class Category(BaseNameSlugModel):
     # Модель для выбора категории произведения
-    class Meta:
+    class Meta(BaseNameSlugModel.Meta):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
 
 class Genre(BaseNameSlugModel):
     # Модель для выбора жанра произведения
-    class Meta:
+    class Meta(BaseNameSlugModel.Meta):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
@@ -23,7 +23,7 @@ class Genre(BaseNameSlugModel):
 class Title(models.Model):
     # Модель для хранения информации о произведении
     name = models.CharField('Название', max_length=NAME_LENGTH)
-    year = models.IntegerField(
+    year = models.SmallIntegerField(
         'Год выхода',
         validators=(check_year_availability,)
     )
@@ -35,7 +35,7 @@ class Title(models.Model):
         related_name='titles',
         verbose_name='Категория',
     )
-    genre = models.ManyToManyField(Genre)
+    genre = models.ManyToManyField(Genre, verbose_name='Жанр')
 
     class Meta:
         verbose_name = 'Произведение'
