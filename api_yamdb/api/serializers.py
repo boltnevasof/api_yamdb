@@ -108,6 +108,17 @@ class AdminUsersSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
+
+    '''
+    Если не указать эти поля то падают тесты:
+    tests/test_00_user_registration.py::Test00UserRegistration::test_get_new_confirmation_code_for_existing_user
+    tests/test_00_user_registration.py::Test00UserRegistration::test_get_confirmation_code_for_user_created_by_admin
+
+    Если не указать max_length то падают тесты:
+    tests/test_00_user_registration.py::Test00UserRegistration::test_00_singup_length_and_simbols_validation[data0-messege0]
+    tests/test_00_user_registration.py::Test00UserRegistration::test_00_singup_length_and_simbols_validation[data1-messege1]
+    '''
+
     email = serializers.EmailField(
         max_length=User._meta.get_field('email').max_length,
     )
