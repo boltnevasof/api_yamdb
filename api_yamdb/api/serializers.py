@@ -3,6 +3,7 @@ from django.db import IntegrityError
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from reviews.models import Category, Comment, Genre, Review, Title
+from django.core.validators import RegexValidator
 
 from users.models import REGEX_USERNAME, ROLE_CHOICES
 
@@ -107,11 +108,27 @@ class AdminUsersSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True, max_length=254)
-    username = serializers.RegexField(
-        regex=REGEX_USERNAME,
-        max_length=150,
-        required=True,
+    '''
+    Если не указать эти поля то падают тесты:
+    tests/test_00_user_registration.py::Test00UserRegistration::test_get_new_confirmation_code_for_existing_user
+    tests/test_00_user_registration.py::Test00UserRegistration::test_get_confirmation_code_for_user_created_by_admin
+
+    Если не указать max_length то падают тесты:
+    tests/test_00_user_registration.py::Test00UserRegistration::test_00_singup_length_and_simbols_validation[data0-messege0]
+    tests/test_00_user_registration.py::Test00UserRegistration::test_00_singup_length_and_simbols_validation[data1-messege1]
+    '''
+    email = serializers.EmailField(
+        max_length=User._meta.get_field('email').max_length,
+    )
+    username = serializers.CharField(
+        max_length=User._meta.get_field('username').max_length,
+        validators=[
+            RegexValidator(
+                regex=REGEX_USERNAME,
+                message='Введите правильное имя пользователя.',
+                code='invalid_username'
+            )
+        ]
     )
 
     class Meta:
